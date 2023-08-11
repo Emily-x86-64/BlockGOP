@@ -4,7 +4,8 @@
   "version": "23.08",
   "description": "A browser extention that removes the phrase GOP from websites",
   "permissions": [
-    "activeTab"
+    "activeTab",
+    "storage"
   ],
   "icons": {
     "16": "icon16.png",
