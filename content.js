@@ -1,19 +1,26 @@
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-    if (request.action === "substitue") {
-        const config = request.config;
-        if (config.replacement && config.withText) {
-            const elements = document.getElementsByTagName("*");
-            for (let i = 0; i < elements.length; i++) {
-                const element = elements[i];
-                for(let j = 0; j < element.childNodes.length; j++) {
-                    const node = element.childNodes[j];
-                    if (node.nodeType === Node.TEXT_NODE) {
-                        const text = node.nodeValue;
-                        const newText = text.replace(new RegExp(config.replacement, "gi"), config.withText);
-                        node.nodeValue = newText;
-                    }
-                }
-            }
-        }
-    }
-});
+// This is the content script that runs on every webpage
+const regexGOP = /\bGOP\b/gi; // This regex matches all forms of the word "GOP" (case-insensitive, whole word)
+const replacement = "Republican"; // The word to replace "GOP" with
+
+function replaceTextOnPage() {
+  // Find all text nodes on the page
+  const textNodes = document.evaluate(
+    "//text()",
+    document,
+    null,
+    XPathResult.UNORDERED_NODE_SNAPSHOT_TYPE,
+    null
+  );
+
+  for (let i = 0; i < textNodes.snapshotLength; i++) {
+    const node = textNodes.snapshotItem(i);
+    node.nodeValue = node.nodeValue.replace(regexGOP, replacement);
+  }
+}
+
+// Run the function when the page is loaded or updated
+replaceTextOnPage();
+
+// Run the function again if the page content changes (AJAX, SPA, etc.)
+const observer = new MutationObserver(replaceTextOnPage);
+observer.observe(document, { subtree: true, childList: true });
